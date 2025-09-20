@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "videoId",
+              "value": "Zi_XLOBDo_Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0d5900c0-9bf3-4a34-8191-eb9fc53464ab",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const result = $json;\n\nreturn {\n  success: true,\n  message: `Download result: ${result.status}`,\n  videoId: result.videoId,\n  title: result.title || 'Unknown',\n  file: result.file || 'No file',\n  status: result.status,\n  details: result.message || 'No message',\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "f63f8502-24ba-422b-a00d-010fbd17f259",
+      "name": "Show Result",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        192,
+        560
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b45a0b57-633d-445f-b26b-7c50f0aa3e79",
+      "name": "Trigger1",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://9cf517f88915.ngrok-free.app/download",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "videoId",
+              "value": "={{ $json.videoId }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "53413e71-ce8f-4385-b35f-7f0ddc3fd2ce",
+      "name": "Download Audio1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -48,
+        560
+      ]
+    }
+  ],
+  "connections": {
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Download Audio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio1": {
+      "main": [
+        [
+          {
+            "node": "Show Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1748d5337af5624df87289396f6d8b251d069aa8c4d79ec8a1dd0ac1e49a254a"
+  }
+}
